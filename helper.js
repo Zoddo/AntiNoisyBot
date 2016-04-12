@@ -74,7 +74,7 @@ function initialize()
 				ban_instable: row['ban_instable'],
 				ban_nickflood: row['ban_nickflood'],
 				report_only: row['report_only'],
-				tracked_quits: {},
+				points: {},
 				already_detected: {},
 			};
 			op.add_channel(row['name']);
@@ -104,7 +104,7 @@ function monitor_channel(channel, report_only, callback)
 					ban_instable: row['ban_instable'],
 					ban_nickflood: row['ban_nickflood'],
 					report_only: row['report_only'],
-					tracked_quits: {},
+					points: {},
 					already_detected: {},
 				};
 
@@ -235,18 +235,6 @@ var ban = {
 	},
 };
 
-function prune_tracked_quits(channel)
-{
-	Object.keys(bot.monitored_channels[channel].tracked_quits).forEach(function (host) {
-		bot.monitored_channels[channel].tracked_quits[host].forEach(function (value, index) {
-			if (value + bot.conf.max_part_time < Date.now())
-				bot.monitored_channels[channel].tracked_quits[host].splice(index, 1);
-		});
-		if (bot.monitored_channels[channel].tracked_quits[host].length < 1)
-			delete bot.monitored_channels[channel].tracked_quits[host];
-	});
-}
-
 function get_account(nick)
 {
 	nick = nick.toLowerCase();
@@ -302,7 +290,6 @@ exports.initialize = initialize;
 exports.monitor_channel = monitor_channel;
 exports.unmonitor_channel = unmonitor_channel;
 exports.ban = ban;
-exports.prune_tracked_quits = prune_tracked_quits;
 exports.get_account = get_account;
 exports.error = error;
 exports.info = info;

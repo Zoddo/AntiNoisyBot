@@ -40,7 +40,6 @@ bot.once('preinitialization', function() {
 	client.on('kick', events.on_kick);
 	client.on('error', events.on_error);
 
-	client.on('part', events.monitor.part);
 	client.on('quit', events.monitor.quit);
 });
 

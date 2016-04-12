@@ -44,7 +44,7 @@ function check_wanted_join(channel, nick)
 					ban_instable: row['ban_instable'],
 					ban_nickflood: row['ban_nickflood'],
 					report_only: row['report_only'],
-					tracked_quits: {},
+					points: {},
 					already_detected: {},
 				};
 
@@ -141,53 +141,59 @@ function mode_del(channel, by, mode, argument, message)
 }
 
 var monitor = {
-	part: function (channel, nick, reason, message) {
-		if (bot.initialized && nick != client.nick && channel in bot.monitored_channels)
+	quit: function (nick, reason, channels, message) {
+		if (bot.initialized && nick != client.nick)
 		{
 			// Check if affected by "notrigger" restriction
 			var user = client.userData(nick);
 			if (bot.has_restrict('notrigger', user.hostname, user.account))
 				return;
 
+			// How many points?
+			var points = bot.conf.noisy_points.default;
+			Object.keys(bot.conf.noisy_points).forEach(function(value) {
+				if (reason.indexOf(value) === 0)
+					points = bot.conf.noisy_points[value];
+			});
+
+			// No points to add...
+			if (points === 0)
+				return;
+
+			channels.forEach(function (channel) {
+				monitor.process_channels(channel, nick, reason, message, points);
+			});
+		}
+	},
+	process_channels: function (channel, nick, reason, message, points) {
+		if (channel in bot.monitored_channels)
+		{
 			// If the host has already been detected in the last 4 hours, we do nothing
 			if (message.host in bot.monitored_channels[channel].already_detected &&
 				bot.monitored_channels[channel].already_detected[message.host] + (240 * 60 * 1000) > Date.now())
 					return;
 
-			// We add this part/quit to the tracked_quits list
-			if (!(message.host in bot.monitored_channels[channel].tracked_quits))
-				bot.monitored_channels[channel].tracked_quits[message.host] = [];
-			bot.monitored_channels[channel].tracked_quits[message.host].push(Date.now());
+			// We add the points for this quit
+			if (!(message.host in bot.monitored_channels[channel].points))
+				bot.monitored_channels[channel].points[message.host] = 0;
+			bot.monitored_channels[channel].points[message.host] += points;
 
-			// If we have reached the max part/quit number...
-			if (bot.monitored_channels[channel].tracked_quits[message.host].length > bot.conf.max_part_number)
+			// Remove the points when expired...
+			setTimeout(function() {
+				bot.monitored_channels[channel].points[message.host] -= points;
+			}, bot.conf.noisy_points_expire);
+
+			// If we have reached the max points numbers
+			if (bot.monitored_channels[channel].points[message.host] >= bot.conf.noisy_points_max)
 			{
-				// First, prune tracked quits for this channel (in case of expired records)
-				helper.prune_tracked_quits(channel);
-				// then, we re-test
-				if (bot.monitored_channels[channel].tracked_quits[message.host].length > bot.conf.max_part_number)
-				{
-					// Ok, the host has really reached the limit. We add a ban (if not in report_only mode) and report that in the main channel.
-					if (!bot.monitored_channels[channel].report_only)
-						helper.ban.add(channel, helper.BAN_INSTABLE_CONNECTION, '*!*@'+message.host, bot.monitored_channels[channel].ban_instable);
+				// We add a ban (if not in report_only mode) and report that in the main channel.
+				if (!bot.monitored_channels[channel].report_only)
+					helper.ban.add(channel, helper.BAN_INSTABLE_CONNECTION, '*!*@'+message.host, bot.monitored_channels[channel].ban_instable);
 
-					helper.info('[' + colors.wrap('bold', channel) + '] Noisy detected from ' + colors.wrap('bold', message.host) + '.');
+				helper.info('[' + colors.wrap('bold', channel) + '] Noisy detected from ' + colors.wrap('bold', message.host) + '.');
 
-					bot.monitored_channels[channel].already_detected[message.host] = Date.now();
-				}
+				bot.monitored_channels[channel].already_detected[message.host] = Date.now();
 			}
-		}
-	},
-	quit: function (nick, reason, channels, message) {
-		if (bot.initialized && nick != client.nick)
-		{
-			// Ignore some cases
-			if (['Changing host', '*.net *.split', 'K-Lined'].indexOf(reason) !== -1)
-				return;
-
-			channels.forEach(function (channel) {
-				monitor.part(channel, nick, reason, message);
-			});
 		}
 	},
 };
