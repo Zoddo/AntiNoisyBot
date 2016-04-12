@@ -160,6 +160,10 @@ var monitor = {
 			if (points === 0)
 				return;
 
+			// If connected, add a margin
+			if (user.account != '')
+				points /= (points < bot.conf.noisy_points_max/2) ? 1.5 : 2;
+
 			channels.forEach(function (channel) {
 				monitor.process_channels(channel, nick, reason, message, points);
 			});
