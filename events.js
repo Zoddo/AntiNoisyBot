@@ -41,7 +41,7 @@ function check_wanted_join(channel, nick)
 			else
 			{
 				bot.monitored_channels[channel] = {
-					ban_instable: row['ban_instable'],
+					ban_unstable: row['ban_unstable'],
 					ban_nickflood: row['ban_nickflood'],
 					report_only: row['report_only'],
 					points: {},
@@ -192,7 +192,7 @@ var monitor = {
 			{
 				// We add a ban (if not in report_only mode) and report that in the main channel.
 				if (!bot.monitored_channels[channel].report_only)
-					helper.ban.add(channel, helper.BAN_INSTABLE_CONNECTION, '*!*@'+message.host, bot.monitored_channels[channel].ban_instable);
+					helper.ban.add(channel, helper.BAN_UNSTABLE_CONNECTION, '*!*@'+message.host, bot.monitored_channels[channel].ban_unstable);
 
 				helper.info('[' + colors.wrap('bold', channel) + '] Noisy detected from ' + colors.wrap('bold', message.host) + '.');
 

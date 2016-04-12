@@ -3,7 +3,7 @@ var colors = require('irc/lib/colors');
 
 const BAN_NORMAL = 1;
 const BAN_QUIET = 2;
-const BAN_INSTABLE_CONNECTION = 3;
+const BAN_UNSTABLE_CONNECTION = 3;
 
 function update_db(callback)
 {
@@ -25,7 +25,7 @@ function update_db(callback)
 				switch (row.value) // This switch has no break statements to update to the last structure in one time
 				{
 					case '0':
-						db.run("CREATE TABLE channels(name TEXT UNIQUE, ban_instable INT DEFAULT '86400', ban_nickflood INT DEFAULT '86400', report_only INT NOT NULL DEFAULT '0')");
+						db.run("CREATE TABLE channels(name TEXT UNIQUE, ban_unstable INT DEFAULT '86400', ban_nickflood INT DEFAULT '86400', report_only INT NOT NULL DEFAULT '0')");
 						db.run("CREATE TABLE channels_bans(channel TEXT, type INT, mask TEXT, expire INT, FOREIGN KEY(channel) REFERENCES channels(name))");
 
 					case '1':
@@ -71,7 +71,7 @@ function initialize()
 	client.join(bot.conf.channel, function() {
 		db.each("SELECT * FROM channels", [], function(err, row) {
 			bot.monitored_channels[row['name']] = {
-				ban_instable: row['ban_instable'],
+				ban_unstable: row['ban_unstable'],
 				ban_nickflood: row['ban_nickflood'],
 				report_only: row['report_only'],
 				points: {},
@@ -101,7 +101,7 @@ function monitor_channel(channel, report_only, callback)
 			// We read the row just inserted to get default values
 			db.get("SELECT * FROM channels WHERE name = ?", channel, function(err, row) {
 				bot.monitored_channels[channel] = {
-					ban_instable: row['ban_instable'],
+					ban_unstable: row['ban_unstable'],
 					ban_nickflood: row['ban_nickflood'],
 					report_only: row['report_only'],
 					points: {},
@@ -199,8 +199,8 @@ var ban = {
 					op.mode(value.channel, '-q', value.mask);
 					break;
 
-				case BAN_INSTABLE_CONNECTION:
-					op.mode(value.channel, '-b', value.mask + '$' + bot.conf.instable_connections_channel);
+				case BAN_UNSTABLE_CONNECTION:
+					op.mode(value.channel, '-b', value.mask + '$' + bot.conf.unstable_connections_channel);
 					break;
 
 				default: //BAN_NORMAL
@@ -218,8 +218,8 @@ var ban = {
 					op.mode(value.channel, '+q', value.mask);
 					break;
 
-				case BAN_INSTABLE_CONNECTION:
-					op.mode(value.channel, '+b', value.mask + '$' + bot.conf.instable_connections_channel);
+				case BAN_UNSTABLE_CONNECTION:
+					op.mode(value.channel, '+b', value.mask + '$' + bot.conf.unstable_connections_channel);
 					break;
 
 				default: //BAN_NORMAL
@@ -283,7 +283,7 @@ function debug(message)
 exports.op = op;
 exports.BAN_NORMAL = BAN_NORMAL;
 exports.BAN_QUIET = BAN_QUIET;
-exports.BAN_INSTABLE_CONNECTION = BAN_INSTABLE_CONNECTION;
+exports.BAN_UNSTABLE_CONNECTION = BAN_UNSTABLE_CONNECTION;
 exports.update_db = update_db;
 exports.connect_irc = connect_irc;
 exports.initialize = initialize;
