@@ -1,0 +1,30 @@
+{
+  "name": "antinoisybot",
+  "version": "1.0.0",
+  "description": "An IRC bot to prevent noisy (quit/join flood due to unstable connection, etc.)",
+  "main": "bot.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Zoddo/AntiNoisy.git"
+  },
+  "keywords": [
+    "IRC",
+    "bot",
+    "Noisy",
+    "protection"
+  ],
+  "author": "Zoddo",
+  "license": "GPL-2.0",
+  "bugs": {
+    "url": "https://github.com/Zoddo/AntiNoisy/issues"
+  },
+  "homepage": "https://github.com/Zoddo/AntiNoisy#readme",
+  "dependencies": {
+    "irc": "git+https://github.com/martynsmith/node-irc.git",
+    "sqlite3": "^3.1.1"
+  }
+}
