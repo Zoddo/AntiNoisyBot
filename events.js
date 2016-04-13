@@ -149,6 +149,9 @@ var monitor = {
 			if (bot.has_restrict('notrigger', user.hostname, user.account))
 				return;
 
+			if (typeof reason === 'undefined')
+				reason = '';
+
 			// How many points?
 			var points = bot.conf.noisy_points.default;
 			Object.keys(bot.conf.noisy_points).forEach(function(value) {
