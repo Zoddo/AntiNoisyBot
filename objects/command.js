@@ -14,8 +14,7 @@ function command(name, not_debug)
 command.prototype.flags = '';
 command.prototype.flags_or = false;
 
-command.prototype.code = function(args, raw)
-{
+command.prototype.code = function(args, raw) {
 	var self = this;
 	throw new exceptions.invalidCommand('Command not implemented: ' + self.name);
 };

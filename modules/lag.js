@@ -1,13 +1,11 @@
 var module = require('../objects/module.js').module;
 var lag = new module('lag');
 
-lag.load = function()
-{
+lag.load = function() {
 	outputDelay(300, 1000);
 };
 
-lag.unload = function()
-{
+lag.unload = function() {
 	clearTimeout(lag.timeout);
 };
 
@@ -27,9 +25,7 @@ function outputDelay(interval, maxDelay)
 		var delay = getHrDiffTime(before) - interval;
 
 		if (delay > maxDelay)
-		{
 			helper.debug('Heavy cycle detected: ' + delay + ' ms.');
-		}
 
 		outputDelay(interval, maxDelay);
 	}, interval);

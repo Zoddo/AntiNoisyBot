@@ -10,18 +10,15 @@ function module(name)
 	self.name = name;
 };
 
-module.prototype.load = function()
-{
+module.prototype.load = function() {
 	var self = this;
 	throw new exceptions.invalidModule('Module not implemented: ' + self.name);
 };
-module.prototype.unload = function()
-{
+module.prototype.unload = function() {
 	throw new exceptions.unloadableModule;
 };
 module.prototype.reload_data = function() {};
-module.prototype.reload = function()
-{
+module.prototype.reload = function() {
 	this.load();
 };
 

@@ -9,19 +9,16 @@ flags.flags = 'faA';
 setflags.flags = 'fA';
 flags.flags_or = setflags.flags_or = true;
 
-module.load = function()
-{
+module.load = function() {
 	bot.commands.add(flags);
 	bot.commands.add(setflags);
 };
-module.unload = function()
-{
+module.unload = function() {
 	bot.commands.del(flags);
 	bot.commands.del(setflags);
 };
 
-flags.code = function(from, channel, args)
-{
+flags.code = function(from, channel, args) {
 	if (!args[0])
 		return;
 
@@ -30,8 +27,7 @@ flags.code = function(from, channel, args)
 	else
 		client.say(channel, 'The account ' + colors.wrap('bold', args[0]) + ' has flags ' + colors.wrap('bold', bot.users[args[0]]) + '.');
 };
-setflags.code = function(from, channel, args)
-{
+setflags.code = function(from, channel, args) {
 	if (!args[0])
 		return;
 

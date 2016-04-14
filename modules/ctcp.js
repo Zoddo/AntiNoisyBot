@@ -1,13 +1,11 @@
 var module = require('../objects/module.js').module;
 var ctcp = new module('ctcp');
 
-ctcp.load = function()
-{
+ctcp.load = function() {
 	client.on('ctcp-version', onVersion);
 };
 
-ctcp.unload = function()
-{
+ctcp.unload = function() {
 	client.removeListener('ctcp-version', onVersion);
 };
 

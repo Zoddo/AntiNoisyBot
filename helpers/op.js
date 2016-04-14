@@ -4,8 +4,7 @@ var mode_queue = {};
 
 function exec(channel, callback)
 {
-	if (!(channel in channels))
-	{
+	if (!(channel in channels)) {
 		error('!!!BUG!!! Call to helper.op.exec() on an unknown channel: ' + channel);
 		return;
 	}
@@ -16,8 +15,7 @@ function exec(channel, callback)
 
 function mode(channel, mode, arg)
 {
-	if (!(channel in channels))
-	{
+	if (!(channel in channels)) {
 		error('!!!BUG!!! Call to helper.op.mode() on an unknown channel: ' + channel);
 		return;
 	}
@@ -28,8 +26,7 @@ function mode(channel, mode, arg)
 
 function request_op(channel)
 {
-	if (client.chans[channel].users[client.nick] != '@' && (!channels[channel].op_requested || channels[channel].deop_requested))
-	{
+	if (client.chans[channel].users[client.nick] != '@' && (!channels[channel].op_requested || channels[channel].deop_requested)) {
 		client.send('CHANSERV', 'OP', channel);
 		channels[channel].op_requested = true;
 	}
@@ -51,8 +48,7 @@ function process(channel)
 		mode.push(value.mode);
 		if (value.arg !=  '') arg.push(value.arg);
 
-		if (mode.length && mode.length >= bot.conf.max_modes)
-		{
+		if (mode.length && mode.length >= bot.conf.max_modes) {
 			client.send('MODE', channel, mode.join(''), arg.join(' '), '');
 			mode = [], arg = [];
 		}
@@ -67,8 +63,7 @@ function process(channel)
 
 function add_channel(channel)
 {
-	if (channel in bot.monitored_channels && channel in client.chans && !(channel in channels))
-	{
+	if (channel in bot.monitored_channels && channel in client.chans && !(channel in channels)) {
 		channels[channel] = {
 			op_requested: false,
 			deop_requested: false,
@@ -91,13 +86,11 @@ function del_channel(channel)
 
 bot.on('preinitialization', function() {
 	client.on('join', function (channel, nick) {
-		if (channel in bot.monitored_channels && nick == client.nick)
-		{
+		if (channel in bot.monitored_channels && nick == client.nick) {
 			add_channel(channel);
 
 			client.once('names' + channel, function (nicks) {
-				if (nicks[client.nick] == '@')
-				{
+				if (nicks[client.nick] == '@') {
 					channels[channel].deop_requested = true;
 					client.send('MODE', channel, '-o', client.nick);
 				}
@@ -106,8 +99,7 @@ bot.on('preinitialization', function() {
 	});
 
 	client.on('op', function (channel) {
-		if (channel in channels)
-		{
+		if (channel in channels) {
 			channels[channel].op_requested = false;
 			setTimeout(process, 1000, channel); // We wait 1 second to allow other scripts to do some work
 		}
@@ -115,16 +107,12 @@ bot.on('preinitialization', function() {
 
 	client.on('deop', function (channel) {
 		if (channel in channels)
-		{
 			channels[channel].deop_requested = false;
-		}
 	});
 
 	client.on('part', function (channel, nick) {
 		if (nick == client.nick)
-		{
 			del_channel(channel);
-		}
 	});
 });
 

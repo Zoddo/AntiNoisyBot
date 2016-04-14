@@ -5,17 +5,14 @@ var restrict = new command('restrict');
 
 restrict.flags = 'a';
 
-module.load = function()
-{
+module.load = function() {
 	bot.commands.add(restrict);
 };
-module.unload = function()
-{
+module.unload = function() {
 	bot.commands.del(restrict);
 };
 
-restrict.code = function(from, channel, args)
-{
+restrict.code = function(from, channel, args) {
 	if (args.length < 4 || ['account', 'host', 'nick'].indexOf(args[0]) === -1)
 		return;
 
@@ -34,13 +31,11 @@ restrict.code = function(from, channel, args)
 			this.exec(channel, 'account', user.account, action, args);
 		if (!user.account || action == 'has')
 			this.exec(channel, 'host', user.hostname, action, args);
-	} else {
+	} else
 		this.exec(channel, type, id, action, args);
-	}
 };
 
-restrict.exec = function(channel, type, id, action, restricts)
-{
+restrict.exec = function(channel, type, id, action, restricts) {
 	switch (action) {
 		case 'add':
 			restricts.forEach(function(restrict) {

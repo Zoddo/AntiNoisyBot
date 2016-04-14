@@ -3,8 +3,7 @@ var modules = {};
 function load(name)
 {
 	name = name.toLowerCase();
-	if (name in modules)
-	{
+	if (name in modules) {
 		helper.error('Trying to load an already loaded module: ' + name);
 		return;
 	}
@@ -30,8 +29,7 @@ function load(name)
 function reload(name)
 {
 	name = name.toLowerCase();
-	if (!(name in modules))
-	{
+	if (!(name in modules)) {
 		helper.error('Trying to reload a not loaded module: ' + name + '. Loading the module...');
 		load(name);
 		return;
@@ -52,14 +50,12 @@ function reload(name)
 	}
 	catch (e)
 	{
-		if (typeof e.type === 'string' && e.type === 'module')
-		{
+		if (typeof e.type === 'string' && e.type === 'module') {
 			if (e.name === 'unloadableModule')
 				helper.error('The module ' + name + ' is unloadable.');
 			else
 				helper.error(e.name + ' has been throw: ' + e.message);
-		}
-		else
+		} else
 			throw e;
 	}
 }
@@ -67,8 +63,7 @@ function reload(name)
 function unload(name)
 {
 	name = name.toLowerCase();
-	if (!(name in modules))
-	{
+	if (!(name in modules)) {
 		helper.error('Trying to unload a not loaded module: ' + name);
 		return;
 	}
@@ -83,14 +78,12 @@ function unload(name)
 	}
 	catch (e)
 	{
-		if (typeof e.type === 'string' && e.type === 'module')
-		{
+		if (typeof e.type === 'string' && e.type === 'module') {
 			if (e.name === 'unloadableModule')
 				helper.error('The module ' + name + ' is unloadable.');
 			else
 				helper.error(e.name + ' has been throw: ' + e.message);
-		}
-		else
+		} else
 			throw e;
 	}
 }

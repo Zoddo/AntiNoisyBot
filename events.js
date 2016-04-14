@@ -2,13 +2,11 @@ var colors = require('irc/lib/colors');
 
 function identified(nick, to, text)
 {
-	if (nick == 'NickServ' && to == client.nick && text.indexOf('You are now identified for ') > -1)
-	{
+	if (nick == 'NickServ' && to == client.nick && text.indexOf('You are now identified for ') > -1) {
 		bot.loggedin = true;
 		helper.debug('We are now logged in with NickServ.');
 
-		if (client.nick != bot.conf.nickname)
-		{
+		if (client.nick != bot.conf.nickname) {
 			helper.debug('Regaining our nickname ...');
 			client.send('NICKSERV', 'REGAIN', bot.conf.nickname);
 		}
@@ -20,8 +18,7 @@ function identified(nick, to, text)
 
 function check_wanted_join(channel, nick)
 {
-	if (nick == client.nick)
-	{
+	if (nick == client.nick) {
 		if (channel == bot.conf.channel || (typeof bot.conf.channel_debug === 'string' && bot.conf.channel_debug && channel == bot.conf.channel_debug))
 			return;
 
@@ -32,13 +29,10 @@ function check_wanted_join(channel, nick)
 			return;
 
 		db.get("SELECT * FROM channels WHERE name = ?", channel, function(err, row) {
-			if (typeof row === 'undefined')
-			{
+			if (typeof row === 'undefined') {
 				helper.error('We have forced me to join ' + channel);
 				client.part(channel, "I'm joined this channel against my will");
-			}
-			else
-			{
+			} else {
 				bot.monitored_channels[channel] = {
 					ban_unstable: row['ban_unstable'],
 					ban_nickflood: row['ban_nickflood'],
@@ -57,20 +51,16 @@ function get_invite(channel, from)
 {
 	if (!bot.initialized) return;
 
-	if (channel in client.chans)
-	{
+	if (channel in client.chans) {
 		helper.debug('Get an /INVITE to ' + channel + " but I'm already in this channel.");
 		return;
 	}
 
 	db.get("SELECT name FROM channels WHERE name = ?", channel, function(err, row) {
-		if (typeof row !== 'undefined' || channel in bot.channels_in_process.waiting_to_op || channel == bot.conf.channel)
-		{
+		if (typeof row !== 'undefined' || channel in bot.channels_in_process.waiting_to_op || channel == bot.conf.channel) {
 			helper.debug('Get an /INVITE to ' + channel + ' that is already a known channel. Trying to rejoin.');
 			client.join(channel);
-		}
-		else
-		{
+		} else {
 			if (channel in bot.channels_in_process.requested || channel in bot.channels_in_process.waiting_to_join)
 				return;
 
@@ -91,10 +81,8 @@ function get_invite(channel, from)
 }
 
 var op = {
-	process_waiting_to_op: function (channel, oper)
-	{
-		if (channel in bot.channels_in_process.waiting_to_op && oper.toLowerCase() == 'chanserv')
-		{
+	process_waiting_to_op: function (channel, oper) {
+		if (channel in bot.channels_in_process.waiting_to_op && oper.toLowerCase() == 'chanserv') {
 			var from = bot.channels_in_process.waiting_to_op[channel].from;
 			delete bot.channels_in_process.waiting_to_op[channel];
 
@@ -102,8 +90,7 @@ var op = {
 			setTimeout(function () {
 				delete bot.channels_in_process.requested[channel];
 
-				if (client.chans[channel].users[client.nick] != '@')
-				{
+				if (client.chans[channel].users[client.nick] != '@') {
 					helper.error(from + ' has sent to me an invitation to join ' + channel + " but I'm get deopped during the op test");
 					client.part(channel, "I'm unable to be OP in this channel");
 					client.notice(from, "I'm able to get OP in \002" + channel + '\002 but I was deopped by someone.');
@@ -126,23 +113,18 @@ var op = {
 function mode_add(channel, by, mode, argument, message)
 {
 	if (mode == 'o' && argument.toLowerCase() == client.nick.toLowerCase())
-	{
 		client.emit('op', channel, by, message);
-	}
 }
 
 function mode_del(channel, by, mode, argument, message)
 {
 	if (mode == 'o' && argument.toLowerCase() == client.nick.toLowerCase())
-	{
 		client.emit('deop', channel, by, message);
-	}
 }
 
 var monitor = {
 	quit: function (nick, reason, channels, message) {
-		if (bot.initialized && nick != client.nick)
-		{
+		if (bot.initialized && nick != client.nick) {
 			// Check if affected by "notrigger" restriction
 			var user = client.userData(nick);
 			if (bot.has_restrict('notrigger', user.hostname, user.account))
@@ -172,8 +154,7 @@ var monitor = {
 		}
 	},
 	process_channels: function (channel, nick, reason, message, points) {
-		if (channel in bot.monitored_channels)
-		{
+		if (channel in bot.monitored_channels) {
 			// If the host has already been detected in the last 4 hours, we do nothing
 			if (message.host in bot.monitored_channels[channel].already_detected &&
 				bot.monitored_channels[channel].already_detected[message.host] + (240 * 60 * 1000) > Date.now())
@@ -190,8 +171,7 @@ var monitor = {
 			}, bot.conf.noisy_points_expire);
 
 			// If we have reached the max points numbers
-			if (bot.monitored_channels[channel].points[message.host] >= bot.conf.noisy_points_max)
-			{
+			if (bot.monitored_channels[channel].points[message.host] >= bot.conf.noisy_points_max) {
 				// We add a ban (if not in report_only mode) and report that in the main channel.
 				if (!bot.monitored_channels[channel].report_only)
 					helper.ban.add(channel, helper.BAN_UNSTABLE_CONNECTION, '*!*@'+message.host, bot.monitored_channels[channel].ban_unstable);
@@ -206,8 +186,7 @@ var monitor = {
 
 function on_kick(channel, nick, by, reason)
 {
-	if (nick == client.nick)
-	{
+	if (nick == client.nick) {
 		helper.error("I've been kicked from " + channel + ': ' + reason);
 		helper.debug("Kicked from " + channel + ' by ' + by);
 	}

@@ -6,19 +6,15 @@ var ceval = new command('eval');
 
 ceval.flags = 'AdD';
 
-module.load = function()
-{
+module.load = function() {
 	bot.commands.add(ceval);
 };
-module.unload = function()
-{
+module.unload = function() {
 	bot.commands.del(ceval);
 };
 
-ceval.code = function(from, channel, args)
-{
-	if (bot.conf.enable_eval && bot.conf.debug)
-	{
+ceval.code = function(from, channel, args) {
+	if (bot.conf.enable_eval && bot.conf.debug) {
 		var value;
 
 		try {
@@ -30,8 +26,7 @@ ceval.code = function(from, channel, args)
 
 		if (value !== undefined)
 			client.say(channel, colors.wrap('bold', 'Return value: ') + value);
-	}
-	else
+	} else
 		helper.debug(from + ' try to use the EVAL command.');
 };
 

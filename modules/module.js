@@ -10,37 +10,32 @@ modload.flags = 'A';
 modreload.flags = 'A';
 modunload.flags = 'A';
 
-module.load = function()
-{
+module.load = function() {
 	bot.commands.add(modload);
 	bot.commands.add(modreload);
 	bot.commands.add(modunload);
 };
-module.unload = function()
-{
+module.unload = function() {
 	bot.commands.del(modload);
 	bot.commands.del(modreload);
 	bot.commands.del(modunload);
 };
 
-modload.code = function(from, channel, args)
-{
+modload.code = function(from, channel, args) {
 	if (!args[0])
 		return;
 
 	bot.modules.load(args[0]);
 	client.say(channel, 'The module ' + colors.wrap('bold', args[0]) + ' has been loaded.');
 };
-modreload.code = function(from, channel, args)
-{
+modreload.code = function(from, channel, args) {
 	if (!args[0])
 		return;
 
 	bot.modules.reload(args[0]);
 	client.say(channel, 'The module ' + colors.wrap('bold', args[0]) + ' has been reloaded.');
 };
-modunload.code = function(from, channel, args)
-{
+modunload.code = function(from, channel, args) {
 	if (!args[0])
 		return;
 

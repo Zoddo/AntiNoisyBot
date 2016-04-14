@@ -5,22 +5,18 @@ var raw = new command('raw');
 
 raw.flags = 'ad';
 
-module.load = function()
-{
+module.load = function() {
 	bot.commands.add(raw);
 };
-module.unload = function()
-{
+module.unload = function() {
 	bot.commands.del(raw);
 };
 
-raw.code = function(from, channel, args)
-{
+raw.code = function(from, channel, args) {
 	console.log('SEND: ' + args.join(' '));
 
-	if (!client.conn.requestedDisconnect) {
+	if (!client.conn.requestedDisconnect)
 		client.conn.write(args.join(' ') + '\r\n');
-	}
 };
 
 exports.module = module;

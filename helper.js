@@ -9,8 +9,7 @@ function update_db(callback)
 {
 	db.serialize();
 	db.get("SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'config'", [], function(err, row) {
-		if (typeof row === 'undefined')
-		{
+		if (typeof row === 'undefined') {
 			db.run("CREATE TABLE config(name TEXT UNIQUE, value TEXT)");
 			db.run("INSERT INTO config VALUES ('db_version', '0')");
 		}
@@ -18,8 +17,7 @@ function update_db(callback)
 		db.get("SELECT value FROM config WHERE name = 'db_version'", [], function (err, row) {
 			const LAST_VERSION = '2';
 
-			if (row.value != LAST_VERSION)
-			{
+			if (row.value != LAST_VERSION) {
 				console.log('Updating database from version %d to version %d ...', row.value, LAST_VERSION);
 
 				switch (row.value) // This switch has no break statements to update to the last structure in one time
@@ -64,9 +62,7 @@ function connect_irc()
 function initialize()
 {
 	if (bot.conf.debug && typeof bot.conf.channel_debug === 'string' && bot.conf.channel_debug)
-	{
 		client.join(bot.conf.channel_debug);
-	}
 
 	client.join(bot.conf.channel, function() {
 		db.each("SELECT * FROM channels", [], function(err, row) {
@@ -91,8 +87,7 @@ function initialize()
 function monitor_channel(channel, report_only, callback)
 {
 	db.get("SELECT name FROM channels WHERE name = ?", channel, function(err, row) {
-		if (typeof row !== 'undefined')
-		{
+		if (typeof row !== 'undefined') {
 			error('!!!BUG!!! helper.monitor_channel() called for ' + channel + ", but it's an already monitored channel.");
 			return;
 		}
@@ -109,13 +104,9 @@ function monitor_channel(channel, report_only, callback)
 				};
 
 				if (!(channel in client.chans))
-				{
 					client.join(channel);
-				}
 				else
-				{
 					op.add_channel(channel);
-				}
 
 				debug(channel + ' is now a monitored channel.');
 
@@ -128,8 +119,7 @@ function monitor_channel(channel, report_only, callback)
 function unmonitor_channel(channel, callback)
 {
 	db.get("SELECT name FROM channels WHERE name = ?", channel, function(err, row) {
-		if (typeof row === 'undefined')
-		{
+		if (typeof row === 'undefined') {
 			error('!!!BUG!!! helper.unmonitor_channel() called for ' + channel + ", but it's not a monitored channel.");
 			return;
 		}
@@ -138,9 +128,7 @@ function unmonitor_channel(channel, callback)
 			delete bot.monitored_channels[channel];
 
 			if (channel in client.chans)
-			{
-				client.part(channel, 'This channel is now unmonitored :(');
-			}
+				client.part(channel, 'This channel is now unmonitored');
 
 			debug(channel + ' is now unmonitored.');
 
@@ -156,10 +144,8 @@ var ban = {
 	queue_add: [],
 	queue_del: [],
 
-	add: function (channel, type, mask, expire, immed)
-	{
-		if (!(channel in bot.monitored_channels))
-		{
+	add: function (channel, type, mask, expire, immed) {
+		if (!(channel in bot.monitored_channels)) {
 			error('!!!BUG!!! Attempted to set a ban on an unmonitored channel: ' + channel + ' / mask: ' + mask);
 			return;
 		}
@@ -175,10 +161,8 @@ var ban = {
 			ban.process();
 	},
 
-	del: function (channel, type, mask)
-	{
-		if (!(channel in bot.monitored_channels))
-		{
+	del: function (channel, type, mask) {
+		if (!(channel in bot.monitored_channels)) {
 			error('!!!BUG!!! Attempted to set a ban on an unmonitored channel: ' + channel + ' / mask: ' + mask);
 			return;
 		}
@@ -190,8 +174,7 @@ var ban = {
 		});
 	},
 
-	process: function ()
-	{
+	process: function () {
 		ban.queue_del.forEach(function (value) {
 			switch (value.type)
 			{
@@ -248,8 +231,7 @@ function get_account(nick)
 function error(message)
 {
 	console.error('\u001b[01;31mERROR: ' + message + '\u001b[0m');
-	if (typeof client !== 'undefined')
-	{
+	if (typeof client !== 'undefined') {
 		if (bot.conf.channel.toLowerCase() in client.chans && !client.conn.requestedDisconnect)
 			client.say(bot.conf.channel, colors.wrap('light_red', 'ERROR: ' + message));
 
@@ -260,8 +242,7 @@ function error(message)
 
 function info(message)
 {
-	if (typeof client !== 'undefined')
-	{
+	if (typeof client !== 'undefined') {
 		if (bot.conf.channel.toLowerCase() in client.chans && !client.conn.requestedDisconnect)
 			client.say(bot.conf.channel, message);
 	}
@@ -269,8 +250,7 @@ function info(message)
 
 function debug(message)
 {
-	if (bot.conf.debug)
-	{
+	if (bot.conf.debug) {
 		console.log('DEBUG: ' + message);
 		if (typeof client !== 'undefined' && typeof bot.conf.channel_debug === 'string'
 			&& bot.conf.channel_debug.toLowerCase() in client.chans && !client.conn.requestedDisconnect)

@@ -8,19 +8,16 @@ var unmonitor = new command('unmonitor');
 monitor.flags = 'a';
 unmonitor.flags = 'a';
 
-module.load = function()
-{
+module.load = function() {
 	bot.commands.add(monitor);
 	bot.commands.add(unmonitor);
 };
-module.unload = function()
-{
+module.unload = function() {
 	bot.commands.del(monitor);
 	bot.commands.del(unmonitor);
 };
 
-monitor.code = function(from, channel, args)
-{
+monitor.code = function(from, channel, args) {
 	if (!args[0] || args[0].length < 2 || args[0][0] != '#') {
 		client.say(channel, 'Error: Invalid channel name');
 		return;
@@ -33,8 +30,7 @@ monitor.code = function(from, channel, args)
 		client.say(channel, 'The channel ' + args[0] + ' is now monitored' + report_only_msg + '.');
 	});
 };
-unmonitor.code = function(from, channel, args)
-{
+unmonitor.code = function(from, channel, args) {
 	if (!args[0])
 		return;
 

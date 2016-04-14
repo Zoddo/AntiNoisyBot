@@ -40,8 +40,7 @@ client.on('message#', function (nick, to, text, raw) {
 	var args = text.split(' ');
 	var command = args.shift().toLowerCase();
 
-	if (command in commands)
-	{
+	if (command in commands) {
 		if (commands[command].flags != '' && !bot.has_flags(helper.get_account(nick), commands[command].flags, commands[command].flags_or))
 			return;
 
