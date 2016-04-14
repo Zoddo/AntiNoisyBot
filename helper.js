@@ -228,6 +228,17 @@ function get_account(nick)
 	return client.users[nick].account;
 }
 
+function get_identifier(message)
+{
+	var id = message.nick + '!' + message.user + '@' + message.host + ' ';
+	
+	var account = get_account(message.nick);
+	if (account)
+		id += '(' + account + ') ';
+	
+	return id;
+}
+
 function error(message)
 {
 	console.error('\u001b[01;31mERROR: ' + message + '\u001b[0m');
@@ -271,6 +282,7 @@ exports.monitor_channel = monitor_channel;
 exports.unmonitor_channel = unmonitor_channel;
 exports.ban = ban;
 exports.get_account = get_account;
+exports.get_identifier = get_identifier;
 exports.error = error;
 exports.info = info;
 exports.debug = debug;

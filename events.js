@@ -47,69 +47,6 @@ function check_wanted_join(channel, nick)
 	}
 }
 
-function get_invite(channel, from)
-{
-	if (!bot.initialized) return;
-
-	if (channel in client.chans) {
-		helper.debug('Get an /INVITE to ' + channel + " but I'm already in this channel.");
-		return;
-	}
-
-	db.get("SELECT name FROM channels WHERE name = ?", channel, function(err, row) {
-		if (typeof row !== 'undefined' || channel in bot.channels_in_process.waiting_to_op || channel == bot.conf.channel) {
-			helper.debug('Get an /INVITE to ' + channel + ' that is already a known channel. Trying to rejoin.');
-			client.join(channel);
-		} else {
-			if (channel in bot.channels_in_process.requested || channel in bot.channels_in_process.waiting_to_join)
-				return;
-
-			helper.debug("I'm get an INVITE for " + channel);
-			client.notice(from, 'Your request to add ' + bot.conf.nickname + ' to \002' + channel + '\002 has been received.');
-			client.notice(from, ' ');
-			client.notice(from, 'Please set the \002+o\002 flags to \002' + bot.conf.nickname + '\002 in ChanServ.');
-			client.notice(from, 'This can be done by this command:');
-			client.notice(from, '\002/msg ChanServ FLAGS ' + channel + ' ' + bot.conf.nickname + ' +o\002');
-			client.notice(from, ' ');
-			client.notice(from, "I'll join the channel in \0021 minute\002. You must be op in this channel");
-			client.notice(from, 'and I will try to get op with ChanServ to validate the request.');
-
-			bot.channels_in_process.requested[channel] = {from: from, time: Date.now()};
-			setTimeout(timers.processing_channel.join, 60 * 1000, channel, from);
-		}
-	});
-}
-
-var op = {
-	process_waiting_to_op: function (channel, oper) {
-		if (channel in bot.channels_in_process.waiting_to_op && oper.toLowerCase() == 'chanserv') {
-			var from = bot.channels_in_process.waiting_to_op[channel].from;
-			delete bot.channels_in_process.waiting_to_op[channel];
-
-			// Wait 10 seconds to be sur that there is no other bot that try to deop me.
-			setTimeout(function () {
-				delete bot.channels_in_process.requested[channel];
-
-				if (client.chans[channel].users[client.nick] != '@') {
-					helper.error(from + ' has sent to me an invitation to join ' + channel + " but I'm get deopped during the op test");
-					client.part(channel, "I'm unable to be OP in this channel");
-					client.notice(from, "I'm able to get OP in \002" + channel + '\002 but I was deopped by someone.');
-					client.notice(from, 'There is a misconfigured bot that automatically deop me?');
-					client.notice(from, 'If you need help, you can join \002' + bot.conf.channel + '\002.');
-					return;
-				}
-
-				helper.monitor_channel(channel);
-				client.notice(from, 'I now monitor \002' + channel + '\002. By default, I remove my bans after \00224 hours\002.');
-				client.notice(from, "To follow policies of some channels, I'll not stay OP. When I need to do some actions,");
-				client.notice(from, "I'll request the OP status to ChanServ then execute actions before immediately auto-deopping.");
-				client.notice(from, 'If you have some questions or need help, you can join \002' + bot.conf.channel + '\002.');
-				client.send('MODE', channel, '-o', client.nick);
-			}, 10 * 1000);
-		}
-	},
-};
-
 function mode_add(channel, by, mode, argument, message)
 {
 	if (mode == 'o' && argument.toLowerCase() == client.nick.toLowerCase())
@@ -199,8 +136,6 @@ function on_error(message)
 
 exports.identified = identified;
 exports.check_wanted_join = check_wanted_join;
-exports.get_invite = get_invite;
-exports.op = op;
 exports.mode_add = mode_add;
 exports.mode_del = mode_del;
 exports.monitor = monitor;

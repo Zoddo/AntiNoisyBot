@@ -36,7 +36,6 @@ bot.once('preinitialization', function() {
 	client.on('join', events.check_wanted_join);
 	client.on('+mode', events.mode_add);
 	client.on('-mode', events.mode_del);
-	client.on('op', events.op.process_waiting_to_op);
 	client.on('kick', events.on_kick);
 	client.on('error', events.on_error);
 
@@ -44,8 +43,6 @@ bot.once('preinitialization', function() {
 });
 
 bot.once('initialized', function() {
-	client.on('invite', events.get_invite);
-
 	setInterval(timers.recurrent.channels_in_process, 300 * 1000);
 	setInterval(timers.recurrent.ban_expiration, 3600 * 1000);
 	// We can do a verification in 1 minute
