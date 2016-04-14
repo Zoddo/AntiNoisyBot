@@ -12,14 +12,14 @@ unmonitor.flags = 'a';
 module.load = function() {
 	bot.commands.add(monitor);
 	bot.commands.add(unmonitor);
-	
+
 	client.on('invite', on_invite);
 	client.on('op', on_op);
 };
 module.unload = function() {
 	bot.commands.del(monitor);
 	bot.commands.del(unmonitor);
-	
+
 	client.removeListener('invite', on_invite);
 	client.removeListener('op', on_op);
 };
@@ -57,7 +57,7 @@ function on_invite(channel, from, message)
 		helper.debug('Get an /INVITE to ' + channel + " but I'm already in this channel.");
 		return;
 	}
-	
+
 	if (bot.has_restrict('noinvite', message.host, helper.get_account(from))) {
 		helper.error(util.format('%s has tried to invite the bot on %s but is restricted to do that.', helper.get_identifier(message), channel));
 		return;
@@ -71,7 +71,7 @@ function on_invite(channel, from, message)
 			if (channel in bot.channels_in_process.requested || channel in bot.channels_in_process.waiting_to_join)
 				return;
 
-			helper.debug(util.format('%s has sent to me an INVITE for %s.', helper.get_identifier(message), channel));
+			helper.debug(util.format('%s has sent me an INVITE for %s.', helper.get_identifier(message), channel));
 			client.notice(from, 'Your request to add ' + bot.conf.nickname + ' to \002' + channel + '\002 has been received.');
 			client.notice(from, ' ');
 			client.notice(from, 'Please set the \002+o\002 flags to \002' + bot.conf.nickname + '\002 in ChanServ.');
@@ -100,7 +100,7 @@ function join(channel, from, message)
 
 		client.once('names' + channel, function (nicks) {
 			if (typeof nicks[from] === 'undefined' || nicks[from] != '@') {
-				helper.error(helper.get_identifier(message) + ' has sent to me an unauthorized invitation to join ' + channel);
+				helper.error(helper.get_identifier(message) + ' has sent me an unauthorized invitation to join ' + channel);
 				helper.debug(from + " isn't opped in " + channel);
 				client.part(channel, 'Unthorized request to join this channel');
 				client.notice(from, "You aren't opped in \002" + channel + "\002. So, I can't idle in this channel.");
@@ -114,7 +114,7 @@ function join(channel, from, message)
 				if (channel in bot.channels_in_process.waiting_to_op) {
 					delete bot.channels_in_process.waiting_to_op[channel];
 
-					helper.error(helper.get_identifier(message) + ' has sent to me an unauthorized invitation to join ' + channel);
+					helper.error(helper.get_identifier(message) + ' has sent me an unauthorized invitation to join ' + channel);
 					helper.debug("I can't get OP in " + channel);
 					client.part(channel, 'Unthorized request to join this channel');
 					client.notice(from, "I'm unable to get OP in \002" + channel + '\002. Do you have set \002+o\002 flag in ChanServ?');
@@ -128,7 +128,7 @@ function join(channel, from, message)
 			delete bot.channels_in_process.requested[channel];
 			delete bot.channels_in_process.waiting_to_join[channel];
 
-			helper.error(helper.get_identifier(message) + ' has sent to me an invitation to join ' + channel + " but I'm unable to join the channel");
+			helper.error(helper.get_identifier(message) + ' has sent me an invitation to join ' + channel + " but I'm unable to join the channel");
 			client.notice(from, "I'm unable to join \002" + channel + '\002.');
 			client.notice(from, 'If you need help, you can join \002' + bot.conf.channel + '\002.');
 		}
@@ -146,10 +146,10 @@ function on_op(channel, oper)
 			delete bot.channels_in_process.requested[channel];
 
 			if (client.chans[channel].users[client.nick] != '@') {
-				helper.error(from + ' has sent to me an invitation to join ' + channel + " but I'm get deopped during the op test");
+				helper.error(from + ' has sent me an invitation to join ' + channel + " but I'm get deopped during the op test");
 				client.part(channel, "I'm unable to be OP in this channel");
 				client.notice(from, "I'm able to get OP in \002" + channel + '\002 but I was deopped by someone.');
-				client.notice(from, 'There is a misconfigured bot that automatically deop me?');
+				client.notice(from, 'Maybe there is a misconfigured bot that automatically deops me?');
 				client.notice(from, 'If you need help, you can join \002' + bot.conf.channel + '\002.');
 				return;
 			}
