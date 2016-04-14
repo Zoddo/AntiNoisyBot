@@ -11,7 +11,6 @@ function identified(nick, to, text)
 		{
 			helper.debug('Regaining our nickname ...');
 			client.send('NICKSERV', 'REGAIN', bot.conf.nickname);
-			client.send('NICK', bot.conf.nickname);
 		}
 
 		helper.initialize();
