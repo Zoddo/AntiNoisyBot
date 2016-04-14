@@ -3,6 +3,12 @@ var modules = {};
 function load(name)
 {
 	name = name.toLowerCase();
+	if (name in modules)
+	{
+		helper.error('Trying to load an already loaded module: ' + name);
+		return;
+	}
+
 	try
 	{
 		delete require.cache[require.resolve('./modules/' + name)];
