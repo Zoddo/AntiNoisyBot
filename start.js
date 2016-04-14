@@ -13,7 +13,7 @@ if (cluster.isMaster)
 		spawn_number++;
 
 		fork.once('exit', function(code, signal) {
-			if (signal || code !== 0)
+			if ((signal || code !== 0) && signal !== 'SIGINT')
 			{
 				if (code === 20) spawn_number = 0; // Restart requested
 
@@ -34,6 +34,13 @@ if (cluster.isMaster)
 	}
 
 	spawn();
+	
+	process.on('SIGINT', function() {
+		if (fork && !fork.isDead())
+			fork.kill('SIGINT');
+		else
+			process.exit();
+	});
 }
 
 if (cluster.isWorker)
