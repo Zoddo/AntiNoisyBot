@@ -48,12 +48,12 @@ function process(channel)
 		mode.push(value.mode);
 		if (value.arg !=  '') arg.push(value.arg);
 
-		if (mode.length && mode.length >= bot.conf.max_modes) {
+		if (arg.length && arg.length >= bot.conf.max_modes) {
 			client.send('MODE', channel, mode.join(''), arg.join(' '), '');
 			mode = [], arg = [];
 		}
 	});
-	if (mode.length > 0)
+	if (arg.length > 0)
 		client.send('MODE', channel, mode.join(''), arg.join(' '), '');
 
 	channels[channel].deop_requested = true;
