@@ -63,7 +63,7 @@ function process(channel)
 
 function add_channel(channel)
 {
-	if (channel in bot.monitored_channels && channel in client.chans && !(channel in channels)) {
+	if (channel.toLowerCase() in bot.monitored_channels && channel in client.chans && !(channel in channels)) {
 		channels[channel] = {
 			op_requested: false,
 			deop_requested: false,
@@ -86,7 +86,7 @@ function del_channel(channel)
 
 bot.on('preinitialization', function() {
 	client.on('join', function (channel, nick) {
-		if (channel in bot.monitored_channels && nick == client.nick) {
+		if (channel.toLowerCase() in bot.monitored_channels && nick == client.nick) {
 			add_channel(channel);
 
 			client.once('names' + channel, function (nicks) {

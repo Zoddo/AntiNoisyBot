@@ -25,7 +25,7 @@ function check_wanted_join(channel, nick)
 		if (channel in bot.channels_in_process.waiting_to_join || channel in bot.channels_in_process.waiting_to_op)
 			return;
 
-		if (channel in bot.monitored_channels)
+		if (channel.toLowerCase() in bot.monitored_channels)
 			return;
 
 		db.get("SELECT * FROM channels WHERE name = ?", channel, function(err, row) {
@@ -33,7 +33,7 @@ function check_wanted_join(channel, nick)
 				helper.error('We have forced me to join ' + channel);
 				client.part(channel, "I'm joined this channel against my will");
 			} else {
-				bot.monitored_channels[channel] = {
+				bot.monitored_channels[channel.toLowerCase()] = {
 					ban_unstable: row['ban_unstable'],
 					ban_nickflood: row['ban_nickflood'],
 					report_only: row['report_only'],
@@ -86,7 +86,7 @@ var monitor = {
 				points /= (points < bot.conf.noisy_points_max/2) ? 1.5 : 2;
 
 			channels.forEach(function (channel) {
-				monitor.process_channels(channel, nick, reason, message, points);
+				monitor.process_channels(channel.toLowerCase(), nick, reason, message, points);
 			});
 		}
 	},

@@ -66,7 +66,7 @@ function initialize()
 
 	client.join(bot.conf.channel, function() {
 		db.each("SELECT * FROM channels", [], function(err, row) {
-			bot.monitored_channels[row['name']] = {
+			bot.monitored_channels[row['name'].toLowerCase()] = {
 				ban_unstable: row['ban_unstable'],
 				ban_nickflood: row['ban_nickflood'],
 				report_only: row['report_only'],
@@ -95,7 +95,7 @@ function monitor_channel(channel, report_only, callback)
 		db.run("INSERT INTO channels (name, report_only) VALUES (?, ?)", [channel, (report_only ? true : false)], function() {
 			// We read the row just inserted to get default values
 			db.get("SELECT * FROM channels WHERE name = ?", channel, function(err, row) {
-				bot.monitored_channels[channel] = {
+				bot.monitored_channels[channel.toLowerCase()] = {
 					ban_unstable: row['ban_unstable'],
 					ban_nickflood: row['ban_nickflood'],
 					report_only: row['report_only'],
@@ -125,7 +125,7 @@ function unmonitor_channel(channel, callback)
 		}
 
 		db.run("DELETE FROM channels WHERE name = ?", channel, function() {
-			delete bot.monitored_channels[channel];
+			delete bot.monitored_channels[channel.toLowerCase()];
 
 			if (channel in client.chans)
 				client.part(channel, 'This channel is now unmonitored');
@@ -145,7 +145,7 @@ var ban = {
 	queue_del: [],
 
 	add: function (channel, type, mask, expire, immed) {
-		if (!(channel in bot.monitored_channels)) {
+		if (!(channel.toLowerCase() in bot.monitored_channels)) {
 			error('!!!BUG!!! Attempted to set a ban on an unmonitored channel: ' + channel + ' / mask: ' + mask);
 			return;
 		}
@@ -162,7 +162,7 @@ var ban = {
 	},
 
 	del: function (channel, type, mask) {
-		if (!(channel in bot.monitored_channels)) {
+		if (!(channel.toLowerCase() in bot.monitored_channels)) {
 			error('!!!BUG!!! Attempted to set a ban on an unmonitored channel: ' + channel + ' / mask: ' + mask);
 			return;
 		}
