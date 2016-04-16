@@ -33,7 +33,7 @@ db.once('open', function () {
 });
 
 bot.once('preinitialization', function() {
-	client.on('join', events.check_wanted_join);
+	client.on('join', events.on_join);
 	client.on('+mode', events.mode_add);
 	client.on('-mode', events.mode_del);
 	client.on('kick', events.on_kick);

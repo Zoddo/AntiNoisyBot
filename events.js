@@ -16,23 +16,11 @@ function identified(nick, to, text)
 	}
 }
 
-function check_wanted_join(channel, nick)
+function on_join(channel, nick)
 {
 	if (nick == client.nick) {
-		if (channel == bot.conf.channel || (typeof bot.conf.channel_debug === 'string' && bot.conf.channel_debug && channel == bot.conf.channel_debug))
-			return;
-
-		if (channel in bot.channels_in_process.waiting_to_join || channel in bot.channels_in_process.waiting_to_op)
-			return;
-
-		if (channel.toLowerCase() in bot.monitored_channels)
-			return;
-
 		db.get("SELECT * FROM channels WHERE name = ?", channel, function(err, row) {
-			if (typeof row === 'undefined') {
-				helper.error('We have forced me to join ' + channel);
-				client.part(channel, "I'm joined this channel against my will");
-			} else {
+			if (typeof row !== 'undefined') {
 				bot.monitored_channels[channel.toLowerCase()] = {
 					ban_unstable: row['ban_unstable'],
 					ban_nickflood: row['ban_nickflood'],
@@ -136,7 +124,7 @@ function on_error(message)
 }
 
 exports.identified = identified;
-exports.check_wanted_join = check_wanted_join;
+exports.on_join = on_join;
 exports.mode_add = mode_add;
 exports.mode_del = mode_del;
 exports.monitor = monitor;

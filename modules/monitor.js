@@ -92,7 +92,6 @@ function join(channel, from, message)
 	bot.channels_in_process.waiting_to_join[channel] = {'from': from};
 	client.join(channel, function() {
 		if (!(channel in bot.channels_in_process.waiting_to_join)) {
-			// events.check_wanted_join() will handle this case
 			return;
 		}
 
