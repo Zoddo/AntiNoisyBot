@@ -15,6 +15,12 @@ function bot()
 		self.conf.loaded_modules.forEach(self.modules.load);
 
 		setInterval(self.save_db.bind(self), 300 * 1000);
+		
+		client.conn.cyclingPingTimer.removeAllListeners('pingTimeout');
+		client.conn.cyclingPingTimer.on('pingTimeout', function() {
+			if (conn === client.conn)
+				self.restart("Server silent for too long and don't reply to PINGs. Automatic restart triggered...");
+		});
 	});
 
 	self.once('initialized', function() {
@@ -231,7 +237,7 @@ bot.prototype.save_db = function() {
 };
 
 bot.prototype.reload = function() {
-
+	// @todo implement
 };
 bot.prototype.restart = function(message) {
 	this.restart_requested = true;
