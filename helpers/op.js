@@ -45,13 +45,13 @@ function process(channel)
 	// Then, we set modes.
 	var mode = [], arg = [];
 	mode_queue[channel].forEach(function (value) {
-		mode.push(value.mode);
-		if (value.arg !=  '') arg.push(value.arg);
-
-		if (arg.length && arg.length >= bot.conf.max_modes) {
+		if (arg.length && arg.length >= bot.conf.max_modes && value.arg != '') {
 			client.send('MODE', channel, mode.join(''), arg.join(' '), '');
 			mode = [], arg = [];
 		}
+
+		mode.push(value.mode);
+		if (value.arg !=  '') arg.push(value.arg);
 	});
 	if (arg.length > 0)
 		client.send('MODE', channel, mode.join(''), arg.join(' '), '');
