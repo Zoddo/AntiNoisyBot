@@ -28,9 +28,8 @@ function del(command)
 
 client.on('message#', function (nick, to, text, raw) {
 	to = to.toLowerCase();
-	var on_admin_chan = (to === bot.conf.channel.toLowerCase() || (bot.conf.debug && typeof bot.conf.channel_debug === 'string' && to === bot.conf.channel_debug.toLowerCase()));
 
-	if (on_admin_chan && text.substr(0, 1) === bot.conf.commands_trigger)
+	if (!(to in bot.monitored_channels) && text.substr(0, 1) === bot.conf.commands_trigger)
 		text = text.substr(1);
 	else if (text.toLowerCase().indexOf(client.nick.toLowerCase()+': ') === 0)
 		text = text.substr(client.nick.length+2);
