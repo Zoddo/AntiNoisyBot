@@ -74,9 +74,9 @@ function quiet(channel, message, reason, remove)
 		return;
 
 	if (remove) client.send('REMOVE', channel, message.nick, reason);
-	client.send('MODE', channel, '+q', '*!*@'+message.host, '');
+	client.send('MODE', channel, '+q', '*!'+message.user+'@'+message.host, '');
 	setTimeout(function() {
-		client.send('MODE', channel, '-q', '*!*@'+message.host, '');
+		client.send('MODE', channel, '-q', '*!'+message.user+'@'+message.host, '');
 	}, 15*60*1000);
 }
 

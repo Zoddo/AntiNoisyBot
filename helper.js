@@ -230,11 +230,11 @@ function get_account(nick)
 
 function get_identifier(message)
 {
-	var id = message.nick + '!' + message.user + '@' + message.host + ' ';
+	var id = message.nick + '!' + message.user + '@' + message.host;
 
 	var account = get_account(message.nick);
 	if (account)
-		id += '(' + account + ') ';
+		id += ' (' + account + ')';
 
 	return id;
 }
