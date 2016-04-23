@@ -17,11 +17,11 @@ var botconf = {
 		//'quit reason': points,
 		'Remote host closed the connection': 3,
 		'Ping timeout': 3, // 4 quits, unstable connection...
+		'Killed': 3,
 		'Max SendQ exceeded': 7, // Probably a spambot
 
 		'Changing host': 0, // Fake quit because of host change
 		'*.net *.split': 0, // Network problem...
-		'Killed': 0, // Disconnected by oper
 		'K-Lined': 0, // Already banned from network, setting a channel ban after that is useless...
 	},
 
@@ -33,6 +33,7 @@ var botconf = {
 		'set',
 		'restrict',
 		'module',
+		'unban',
 		'database',
 		'restart',
 		'raw',
