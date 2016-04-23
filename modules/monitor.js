@@ -53,7 +53,7 @@ function on_invite(channel, from, message)
 	if (!bot.initialized)
 		return;
 
-	if (channel in client.chans) {
+	if (channel.toLowerCase() in client.chans) {
 		helper.debug('Get an /INVITE to ' + channel + " but I'm already in this channel.");
 		return;
 	}
@@ -144,7 +144,7 @@ function on_op(channel, oper)
 		setTimeout(function () {
 			delete bot.channels_in_process.requested[channel];
 
-			if (client.chans[channel].users[client.nick] != '@') {
+			if (client.chans[channel.toLowerCase()].users[client.nick] != '@') {
 				helper.error(from + ' has sent me an invitation to join ' + channel + " but I'm get deopped during the op test");
 				client.part(channel, "I'm unable to be OP in this channel");
 				client.notice(from, "I'm able to get OP in \002" + channel + '\002 but I was deopped by someone.');
