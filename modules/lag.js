@@ -2,7 +2,7 @@ var module = require('../objects/module.js').module;
 var lag = new module('lag');
 
 lag.load = function() {
-	outputDelay(300, 1000);
+	outputDelay(300, 6000);
 };
 
 lag.unload = function() {
