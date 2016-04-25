@@ -15,7 +15,7 @@ function update_db(callback)
 		}
 
 		db.get("SELECT value FROM config WHERE name = 'db_version'", [], function (err, row) {
-			const LAST_VERSION = '2';
+			const LAST_VERSION = '3';
 
 			if (row.value != LAST_VERSION) {
 				console.log('Updating database from version %d to version %d ...', row.value, LAST_VERSION);
@@ -29,6 +29,9 @@ function update_db(callback)
 					case '1':
 						db.run("CREATE TABLE users(account TEXT NOT NULL UNIQUE, flags TEXT NOT NULL)");
 						db.run("CREATE TABLE restrict(host TEXT DEFAULT NULL, account TEXT DEFAULT NULL, restrict TEXT NOT NULL)");
+
+					case '2':
+						db.run("ALTER TABLE channels ADD COLUMN no_deop INT NOT NULL DEFAULT '0'");
 				}
 			}
 
@@ -70,10 +73,11 @@ function initialize()
 				ban_unstable: row['ban_unstable'],
 				ban_nickflood: row['ban_nickflood'],
 				report_only: row['report_only'],
+				no_deop: row['no_deop'],
 				points: {},
 				already_detected: {},
 			};
-			op.add_channel(row['name']);
+			op.add_channel(row['name'], row['no_deop']);
 			client.join(row['name']);
 		}, function() {
 			setTimeout(function () {
@@ -99,6 +103,7 @@ function monitor_channel(channel, report_only, callback)
 					ban_unstable: row['ban_unstable'],
 					ban_nickflood: row['ban_nickflood'],
 					report_only: row['report_only'],
+					no_deop: row['no_deop'],
 					points: {},
 					already_detected: {},
 				};
@@ -106,7 +111,7 @@ function monitor_channel(channel, report_only, callback)
 				if (!(channel in client.chans))
 					client.join(channel);
 				else
-					op.add_channel(channel);
+					op.add_channel(channel, row['no_deop']);
 
 				debug(channel + ' is now a monitored channel.');
 

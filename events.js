@@ -25,11 +25,12 @@ function on_join(channel, nick)
 					ban_unstable: row['ban_unstable'],
 					ban_nickflood: row['ban_nickflood'],
 					report_only: row['report_only'],
+					no_deop: row['no_deop'],
 					points: {},
 					already_detected: {},
 				};
 
-				helper.op.add_channel(channel);
+				helper.op.add_channel(channel, row['no_deop']);
 			}
 		});
 	}
