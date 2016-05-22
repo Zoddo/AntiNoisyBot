@@ -93,7 +93,7 @@ var monitor = {
 
 			// Remove the points when expired...
 			setTimeout(function() {
-				if ((bot.monitored_channels[channel].points[message.host] -= points) <= 0)
+				if (channel in bot.monitored_channels && (bot.monitored_channels[channel].points[message.host] -= points) <= 0)
 					delete bot.monitored_channels[channel].points[message.host];
 			}, bot.conf.noisy_points_expire);
 
