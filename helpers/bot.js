@@ -18,7 +18,7 @@ function bot()
 
 		client.conn.cyclingPingTimer.removeAllListeners('pingTimeout');
 		client.conn.cyclingPingTimer.on('pingTimeout', function() {
-			self.restart("Server silent for too long and don't reply to PINGs. Automatic restart triggered...");
+			self.restart("Server silent for too long and doesn't reply to PINGs. Automatic restart triggered...");
 		});
 	});
 
