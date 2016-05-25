@@ -4,6 +4,7 @@ var mode_queue = {};
 
 function exec(channel, callback)
 {
+	channel = channel.toLowerCase();
 	if (!(channel in channels)) {
 		helper.error('!!!BUG!!! Call to helper.op.exec() on an unknown channel: ' + channel);
 		return;
@@ -15,6 +16,7 @@ function exec(channel, callback)
 
 function mode(channel, mode, arg)
 {
+	channel = channel.toLowerCase();
 	if (!(channel in channels)) {
 		helper.error('!!!BUG!!! Call to helper.op.mode() on an unknown channel: ' + channel);
 		return;
@@ -36,6 +38,8 @@ function request_op(channel)
 
 function process(channel)
 {
+	channel = channel.toLowerCase();
+	
 	// First, we request de-op at the end
 	if (!channels[channel].no_deop) {
 		mode_queue[channel].push({mode: '-o', arg: client.nick});
@@ -67,7 +71,8 @@ function process(channel)
 
 function add_channel(channel, no_deop)
 {
-	if (channel.toLowerCase() in bot.monitored_channels && channel in client.chans && !(channel in channels)) {
+	channel = channel.toLowerCase();
+	if (channel in client.chans && !(channel in channels)) {
 		channels[channel] = {
 			op_requested: false,
 			deop_requested: false,
@@ -81,6 +86,7 @@ function add_channel(channel, no_deop)
 
 function del_channel(channel)
 {
+	channel = channel.toLowerCase();
 	if (channel in channels) {
 		delete channels[channel];
 		delete exec_queue[channel];
@@ -91,8 +97,9 @@ function del_channel(channel)
 
 bot.on('preinitialization', function() {
 	client.on('join', function (channel, nick) {
-		if (channel.toLowerCase() in bot.monitored_channels && nick == client.nick) {
-			add_channel(channel, bot.monitored_channels[channel.toLowerCase()].no_deop);
+		channel = channel.toLowerCase();
+		if (channel in bot.monitored_channels && nick == client.nick) {
+			add_channel(channel, bot.monitored_channels[channel].no_deop);
 
 			client.once('names' + channel, function (nicks) {
 				if (nicks[client.nick] == '@' && !channels[channel].no_deop) {
@@ -104,6 +111,7 @@ bot.on('preinitialization', function() {
 	});
 
 	client.on('op', function (channel) {
+		channel = channel.toLowerCase();
 		if (channel in channels) {
 			channels[channel].op_requested = false;
 			setTimeout(process, 1000, channel); // We wait 1 second to allow other scripts to do some work
@@ -111,11 +119,13 @@ bot.on('preinitialization', function() {
 	});
 
 	client.on('deop', function (channel) {
+		channel = channel.toLowerCase();
 		if (channel in channels)
 			channels[channel].deop_requested = false;
 	});
 
 	client.on('part', function (channel, nick) {
+		channel = channel.toLowerCase();
 		if (nick == client.nick)
 			del_channel(channel);
 	});
