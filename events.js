@@ -26,6 +26,7 @@ function on_join(channel, nick)
 					ban_nickflood: row['ban_nickflood'],
 					report_only: row['report_only'],
 					no_deop: row['no_deop'],
+					banchannel_unstable: row['banchannel_unstable'],
 					points: {},
 					already_detected: {},
 				};

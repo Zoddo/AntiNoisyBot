@@ -4,7 +4,8 @@ var botconf = {
 	server: 'chat.freenode.net',
 	channel: '#AntiNoisyBot',
 	max_modes: 4, // Maximum number of mode that can be set in one MODE command
-	unstable_connections_channel: '#AntiNoisyBot-banned', // Where to redirect instable connections
+	unstable_connections_channel: '#AntiNoisyBot-banned', // Where to redirect unstable connections
+	unstable_banchannel: '#AntiNoisyBot-bans-unstable',
 	debug: true,
 	channel_debug: '#AntiNoisyBot-debug',
 	verbose: true,

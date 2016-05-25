@@ -15,23 +15,26 @@ function update_db(callback)
 		}
 
 		db.get("SELECT value FROM config WHERE name = 'db_version'", [], function (err, row) {
-			const LAST_VERSION = '3';
+			const LAST_VERSION = '4';
 
 			if (row.value != LAST_VERSION) {
 				console.log('Updating database from version %d to version %d ...', row.value, LAST_VERSION);
 
 				switch (row.value) // This switch has no break statements to update to the last structure in one time
 				{
-					case '0':
+					case '0': // update from version 0
 						db.run("CREATE TABLE channels(name TEXT UNIQUE, ban_unstable INT DEFAULT '86400', ban_nickflood INT DEFAULT '86400', report_only INT NOT NULL DEFAULT '0')");
 						db.run("CREATE TABLE channels_bans(channel TEXT, type INT, mask TEXT, expire INT, FOREIGN KEY(channel) REFERENCES channels(name))");
 
-					case '1':
+					case '1': // update from version 1
 						db.run("CREATE TABLE users(account TEXT NOT NULL UNIQUE, flags TEXT NOT NULL)");
 						db.run("CREATE TABLE restrict(host TEXT DEFAULT NULL, account TEXT DEFAULT NULL, restrict TEXT NOT NULL)");
 
-					case '2':
+					case '2': // update from version 2
 						db.run("ALTER TABLE channels ADD COLUMN no_deop INT NOT NULL DEFAULT '0'");
+
+					case '3': // update from version 3
+						db.run("ALTER TABLE channels ADD COLUMN banchannel_unstable INT NOT NULL DEFAULT '0'");
 				}
 			}
 
@@ -74,12 +77,16 @@ function initialize()
 				ban_nickflood: row['ban_nickflood'],
 				report_only: row['report_only'],
 				no_deop: row['no_deop'],
+				banchannel_unstable: row['banchannel_unstable'],
 				points: {},
 				already_detected: {},
 			};
 			op.add_channel(row['name'], row['no_deop']);
 			client.join(row['name']);
 		}, function() {
+			client.join(bot.conf.unstable_banchannel, function() {
+				op.add_channel(bot.conf.unstable_banchannel, true);
+			});
 			setTimeout(function () {
 				bot.initialized = true;
 				bot.emit('initialized');
@@ -104,6 +111,7 @@ function monitor_channel(channel, report_only, callback)
 					ban_nickflood: row['ban_nickflood'],
 					report_only: row['report_only'],
 					no_deop: row['no_deop'],
+					banchannel_unstable: row['banchannel_unstable'],
 					points: {},
 					already_detected: {},
 				};
@@ -188,7 +196,14 @@ var ban = {
 					break;
 
 				case BAN_UNSTABLE_CONNECTION:
-					op.mode(value.channel, '-b', value.mask + '$' + bot.conf.unstable_connections_channel);
+					var channel;
+					if (value.channel in bot.monitored_channels && bot.monitored_channels[value.channel].banchannel_unstable) {
+						channel = bot.conf.unstable_banchannel;
+					} else {
+						channel = value.channel
+					}
+
+					op.mode(channel, '-b', value.mask + '$' + bot.conf.unstable_connections_channel);
 					break;
 
 				default: //BAN_NORMAL
@@ -207,7 +222,14 @@ var ban = {
 					break;
 
 				case BAN_UNSTABLE_CONNECTION:
-					op.mode(value.channel, '+b', value.mask + '$' + bot.conf.unstable_connections_channel);
+					var channel;
+					if (value.channel in bot.monitored_channels && bot.monitored_channels[value.channel].banchannel_unstable) {
+						channel = bot.conf.unstable_banchannel;
+					} else {
+						channel = value.channel
+					}
+
+					op.mode(channel, '+b', value.mask + '$' + bot.conf.unstable_connections_channel);
 					break;
 
 				default: //BAN_NORMAL

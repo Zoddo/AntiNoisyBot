@@ -75,8 +75,46 @@ chanset.code = function(from, channel, args)
 			}
 			break;
 
+		case 'banchannel_unstable':
+			if (['true', 'yes', 'on', 'enable', '1'].indexOf(args[0]) !== -1) {
+				bot.monitored_channels[target].banchannel_unstable = true;
+				convert_unstable_bans.channel_to_banchannel(target, function() {
+					helper.op.mode(target, '+b', '$j:' + bot.conf.unstable_banchannel + '$' + bot.conf.unstable_connections_channel);
+					db.run("UPDATE channels SET banchannel_unstable = ? WHERE name = ?", [true, target], function () {
+						client.say(channel, 'Operation succeeded.');
+					});
+				});
+			} else if (['false', 'no', 'off', 'disable', '0'].indexOf(args[0]) !== -1) {
+				bot.monitored_channels[target].banchannel_unstable = false;
+				convert_unstable_bans.banchannel_to_channel(target, function() {
+					helper.op.mode(target, '-b', '$j:' + bot.conf.unstable_banchannel + '$' + bot.conf.unstable_connections_channel);
+					db.run("UPDATE channels SET banchannel_unstable = ? WHERE name = ?", [false, target], function () {
+						client.say(channel, 'Operation succeeded.');
+					});
+				});
+			} else {
+				client.say(channel, 'ERROR: Invalid value: ' + args[0]);
+			}
+			break;
+
 		default:
 			client.say(channel, 'ERROR: Invalid command: ' + command);
+	}
+};
+
+var convert_unstable_bans = {
+	channel_to_banchannel: function(channel, callback) {
+		db.each("SELECT mask FROM channels_bans WHERE channel = ? AND type = ?", [channel, helper.BAN_UNSTABLE_CONNECTION], function(err, row) {
+			helper.op.mode(bot.conf.unstable_banchannel, '+b', row['mask'] + '$' + bot.conf.unstable_connections_channel);
+			helper.op.mode(channel, '-b', row['mask'] + '$' + bot.conf.unstable_connections_channel);
+		}, callback);
+	},
+
+	banchannel_to_channel: function(channel, callback) {
+		db.each("SELECT mask FROM channels_bans WHERE channel = ? AND type = ?", [channel, helper.BAN_UNSTABLE_CONNECTION], function(err, row) {
+			helper.op.mode(bot.conf.unstable_banchannel, '-b', row['mask'] + '$' + bot.conf.unstable_connections_channel);
+			helper.op.mode(channel, '+b', row['mask'] + '$' + bot.conf.unstable_connections_channel);
+		}, callback);
 	}
 };
 
