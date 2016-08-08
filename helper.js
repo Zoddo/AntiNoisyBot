@@ -97,6 +97,8 @@ function initialize()
 
 function monitor_channel(channel, report_only, callback)
 {
+	channel = channel.toLowerCase();
+
 	db.get("SELECT name FROM channels WHERE name = ?", channel, function(err, row) {
 		if (typeof row !== 'undefined') {
 			error('!!!BUG!!! helper.monitor_channel() called for ' + channel + ", but it's an already monitored channel.");
